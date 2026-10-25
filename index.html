@@ -343,12 +343,11 @@
         if (!res.ok) return;
         var s = res.stats;
         document.getElementById('current-event').textContent =
-          ({ d1: 'Day 1', d2: 'Day 2', d2_exit: 'D2 Exit', qawwali: 'Qawwali', none: 'No Event' })[s.current_event] || s.current_event;
+          ({ d1: 'Day 1', d2: 'Day 2', qawwali: 'Qawwali', none: 'No Event' })[s.current_event] || s.current_event;
 
         var checkedIn = 0;
         if (s.current_event === 'd1') checkedIn = s.d1_scanned;
         else if (s.current_event === 'd2') checkedIn = s.d2_scanned;
-        else if (s.current_event === 'd2_exit') checkedIn = s.d2_exited;
         else if (s.current_event === 'qawwali') checkedIn = s.qawwali_scanned;
 
         document.getElementById('checked-in').textContent = checkedIn + '/' + s.sold;
