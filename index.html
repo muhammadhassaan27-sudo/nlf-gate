@@ -271,42 +271,54 @@
     }
 
     // ── Flash feedback ──
-    function showFlash(res) {
-      var overlay = document.getElementById('flash-overlay');
-      overlay.className = 'flash-overlay show';
+   function showFlash(res) {
+  var overlay = document.getElementById('flash-overlay');
+  overlay.className = 'flash-overlay show';
 
-      if (res.ok) {
-        overlay.classList.add('success');
-        document.getElementById('flash-icon').textContent = '✓';
-        document.getElementById('flash-title').textContent = 'ADMITTED';
-        playFeedback(true);
-      } else if (res.code === 'ALREADY_USED' || res.code === 'ALREADY_EXITED') {
-        overlay.classList.add('duplicate');
-        document.getElementById('flash-icon').textContent = '⚠';
-        document.getElementById('flash-title').textContent = 'DUPLICATE';
-        playFeedback(false);
-      } else {
-        overlay.classList.add('error');
-        document.getElementById('flash-icon').textContent = '✗';
-        document.getElementById('flash-title').textContent = 'DENIED';
-        playFeedback(false);
-      }
+  if (res.ok) {
+    overlay.classList.add('success');
+    document.getElementById('flash-icon').textContent = '✓';
+    document.getElementById('flash-title').textContent = 'ADMITTED';
+    playFeedback(true);
+  } else if (res.code === 'ALREADY_USED' || res.code === 'ALREADY_EXITED') {
+    overlay.classList.add('duplicate');
+    document.getElementById('flash-icon').textContent = '⚠';
+    document.getElementById('flash-title').textContent = 'DUPLICATE';
+    playFeedback(false);
+  } else {
+    overlay.classList.add('error');
+    document.getElementById('flash-icon').textContent = '✗';
+    document.getElementById('flash-title').textContent = 'DENIED';
+    playFeedback(false);
+  }
 
-      document.getElementById('flash-msg').textContent = res.message;
+  document.getElementById('flash-msg').textContent = res.message;
 
-      var ticketInfo = document.getElementById('flash-ticket');
-      if (res.ticket) {
-        ticketInfo.classList.remove('hidden');
-        document.getElementById('flash-name').textContent = res.ticket.student_name;
-        document.getElementById('flash-details').textContent =
-          res.ticket.ticket_id + ' • ' + res.ticket.ticket_type + ' • ' + (res.ticket.house || '');
-      } else {
-        ticketInfo.classList.add('hidden');
-      }
-
-      // Auto-dismiss after 3s (success) or 4s (error)
-      setTimeout(dismissFlash, res.ok ? 3000 : 4000);
+  var ticketInfo = document.getElementById('flash-ticket');
+  if (res.ticket) {
+    ticketInfo.classList.remove('hidden');
+    document.getElementById('flash-name').textContent = res.ticket.student_name;
+    
+    var details = res.ticket.ticket_id + ' • ' + res.ticket.ticket_type + ' • ' + (res.ticket.house || '');
+    
+    // Add late status flags
+    var lateFlags = [];
+    if (res.ticket.late_d1) lateFlags.push('Late Day 1');
+    if (res.ticket.late_d2) lateFlags.push('Late Day 2');
+    if (!res.ticket.d1_used && res.ticket.d2_used) lateFlags.push('Missed Day 1');
+    
+    if (lateFlags.length > 0) {
+      details += ' • ' + lateFlags.join(' | ');
     }
+    
+    document.getElementById('flash-details').textContent = details;
+  } else {
+    ticketInfo.classList.add('hidden');
+  }
+
+  // Auto-dismiss after 3s (success) or 4s (error)
+  setTimeout(dismissFlash, res.ok ? 3000 : 4000);
+}
 
     function dismissFlash() {
       document.getElementById('flash-overlay').className = 'flash-overlay';
